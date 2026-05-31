@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kozimjon Turg'unov — IPhO Fizika</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#080d1a; --bg2:#0f1729; --bg3:#111e33;
+      --border:rgba(255,255,255,.07); --border-h:rgba(245,158,11,.35);
+      --gold:#f59e0b; --text:#e2e8f0; --muted:#94a3b8; --dim:#4e6077;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.7;overflow-x:hidden}
+
+    #cvs{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.3}
+
+    /* ── NAV ── */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:.85rem 2.5rem;display:flex;justify-content:space-between;align-items:center;background:rgba(8,13,26,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--gold);text-decoration:none;letter-spacing:.02em}
+    .nav-links{display:flex;gap:2rem;list-style:none}
+    .nav-links a{color:var(--muted);text-decoration:none;font-size:.84rem;font-weight:300;letter-spacing:.04em;transition:color .2s}
+    .nav-links a:hover{color:var(--text)}
+
+    /* ── HERO ── */
+    #hero{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:7rem 2rem 4rem;text-align:center}
+    .hero-inner{max-width:640px}
+    .hero-badge{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--gold);border:1px solid rgba(245,158,11,.28);padding:.28rem .85rem;border-radius:2px;margin-bottom:1.6rem;letter-spacing:.16em}
+    .hero-name{font-family:'Playfair Display',serif;font-size:clamp(2.6rem,6.5vw,4.8rem);font-weight:700;line-height:1.05;margin-bottom:.4rem}
+    .hero-name span{color:var(--gold)}
+    .hero-sub{font-family:'Playfair Display',serif;font-style:italic;color:var(--muted);font-size:clamp(.95rem,2vw,1.35rem);margin-bottom:2.5rem}
+    .hero-btns{display:flex;gap:.85rem;justify-content:center;flex-wrap:wrap}
+    .btn-gold{background:var(--gold);color:#0c0800;padding:.68rem 1.9rem;font-weight:500;font-size:.88rem;text-decoration:none;border-radius:2px;transition:opacity .2s;letter-spacing:.02em}
+    .btn-gold:hover{opacity:.82}
+    .btn-ghost{border:1px solid var(--border);color:var(--muted);padding:.68rem 1.9rem;font-size:.88rem;text-decoration:none;border-radius:2px;transition:all .2s}
+    .btn-ghost:hover{border-color:var(--border-h);color:var(--gold)}
+
+    /* ── SECTIONS ── */
+    .wrap{position:relative;z-index:1;padding:5.5rem 2rem;max-width:1100px;margin:0 auto}
+    .sec-lbl{font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.45rem}
+    .sec-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3.8vw,2.7rem);font-weight:600;margin-bottom:.85rem;line-height:1.2}
+    .sec-line{width:34px;height:2px;background:var(--gold);margin-bottom:2rem}
+    .sec-desc{color:var(--muted);font-weight:300;margin-bottom:2.25rem;max-width:560px;line-height:1.85;font-size:.97rem}
+
+    /* ── ABOUT ── */
+    .about-name{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,3vw,2rem);color:var(--text);margin-bottom:.5rem}
+    .about-role{font-family:'Playfair Display',serif;font-style:italic;color:var(--muted);font-size:1.1rem;margin-bottom:1.25rem}
+    .about-placeholder{color:var(--dim);font-size:.88rem;font-weight:300;border-left:2px solid var(--border-h);padding-left:1rem;line-height:1.9;max-width:480px}
+
+    /* ── DOWNLOAD ALL BANNER ── */
+    .all-banner{background:var(--bg3);border:1px solid var(--border-h);border-radius:6px;padding:1.6rem 2rem;display:flex;justify-content:space-between;align-items:center;gap:1.5rem;flex-wrap:wrap;margin-bottom:2.5rem}
+    .all-banner-text h3{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--text);margin-bottom:.25rem}
+    .all-banner-text p{font-size:.82rem;color:var(--muted);font-weight:300}
+    .btn-download-all{display:inline-flex;align-items:center;gap:.55rem;background:var(--gold);color:#0c0800;padding:.72rem 1.75rem;border-radius:2px;text-decoration:none;font-size:.88rem;font-weight:500;white-space:nowrap;transition:opacity .2s;flex-shrink:0}
+    .btn-download-all:hover{opacity:.82}
+    .btn-download-all svg{width:16px;height:16px}
+
+    /* ── FILTER TABS ── */
+    .tabs{display:flex;gap:.45rem;margin-bottom:1.75rem;flex-wrap:wrap}
+    .tab{font-family:'JetBrains Mono',monospace;font-size:.7rem;padding:.3rem .75rem;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;border-radius:2px;transition:all .15s;letter-spacing:.05em}
+    .tab:hover,.tab.active{border-color:var(--gold);color:var(--gold)}
+
+    /* ── YEAR CARDS ── */
+    .years-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:1.1rem}
+    .year-card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:1.6rem 1.4rem 1.4rem;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.5rem;transition:border-color .2s,transform .25s,background .2s;cursor:default}
+    .year-card:hover{border-color:var(--border-h);transform:translateY(-3px);background:var(--bg3)}
+    .year-card.ready:hover{cursor:pointer}
+
+    /* Big year number */
+    .ynum{font-family:'Playfair Display',serif;font-size:3rem;font-weight:700;color:var(--gold);line-height:1;letter-spacing:-.02em}
+    .yloc{font-size:.78rem;color:var(--dim);font-weight:300;letter-spacing:.04em;margin-bottom:.45rem}
+
+    /* Download btn inside card */
+    .btn-dl{display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--gold);border:1px solid rgba(245,158,11,.35);padding:.35rem .9rem;border-radius:2px;text-decoration:none;transition:all .2s;background:transparent;cursor:pointer;font-family:'DM Sans',sans-serif}
+    .btn-dl:hover{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.7)}
+    .btn-dl svg{width:13px;height:13px}
+    .btn-dl.coming{opacity:.3;pointer-events:none;color:var(--dim);border-color:var(--border)}
+    .coming-tag{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--dim);letter-spacing:.06em}
+
+    /* ── CONTACT ── */
+    .contact-row{display:flex;gap:1rem;flex-wrap:wrap}
+    .c-card{flex:1;min-width:190px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:1.25rem;text-decoration:none;transition:border-color .2s}
+    .c-card:hover{border-color:var(--border-h)}
+    .c-type{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--gold);letter-spacing:.16em;margin-bottom:.3rem}
+    .c-val{color:var(--text);font-size:.9rem}
+
+    /* ── FOOTER ── */
+    footer{position:relative;z-index:1;text-align:center;padding:2rem;border-top:1px solid var(--border);color:var(--dim);font-size:.8rem}
+
+    /* ── FADE-IN ── */
+    .fi{opacity:0;transform:translateY(16px);transition:opacity .6s,transform .6s}
+    .fi.v{opacity:1;transform:translateY(0)}
+
+    @media(max-width:640px){
+      .nav-links{display:none}
+      .years-grid{grid-template-columns:repeat(2,1fr)}
+      .ynum{font-size:2.4rem}
+      .all-banner{flex-direction:column;align-items:flex-start}
+    }
+    @media(min-width:900px){
+      .years-grid{grid-template-columns:repeat(auto-fill,minmax(175px,1fr))}
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="cvs"></canvas>
+
+<!-- ── NAVBAR ── -->
+<nav>
+  <a class="nav-logo" href="#hero">K.T.</a>
+  <ul class="nav-links">
+    <li><a href="#about">Haqimda</a></li>
+    <li><a href="#ipho">IPhO Arxiv</a></li>
+    <li><a href="#contact">Bog'lanish</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO ── -->
+<div id="hero" style="position:relative;z-index:1">
+  <div class="hero-inner">
+    <div class="hero-badge">IPhO · 1967–2025 · O'zbek tilida</div>
+    <h1 class="hero-name">Kozimjon<br><span>Turg'unov</span></h1>
+    <p class="hero-sub">Fizika o'qituvchisi &amp; IPhO trener</p>
+    <div class="hero-btns">
+      <a href="#ipho" class="btn-gold">IPhO Arxiv →</a>
+      <a href="#about" class="btn-ghost">Haqimda</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── ABOUT ── -->
+<div class="wrap" id="about">
+  <div class="sec-lbl">HAQIMDA</div>
+  <div class="sec-line"></div>
+  <div class="about-name">Kozimjon Turg'unov</div>
+  <div class="about-role">Fizika o'qituvchisi &amp; IPhO trener</div>
+  <div class="about-placeholder">
+    Tez orada to'liq ma'lumot kiritiladi…
+  </div>
+</div>
+
+<!-- ── IPhO ARCHIVE ── -->
+<div class="wrap" id="ipho">
+  <div class="sec-lbl">ARXIV</div>
+  <h2 class="sec-title">IPhO Masala va Yechimlar</h2>
+  <div class="sec-line"></div>
+  <p class="sec-desc">
+    1967–2025 yillar IPhO masalalarining o'zbek tilidagi tarjimasi va yechimlari.
+    Har yil uchun masala va yechim bitta PDF faylda jamlangan.
+  </p>
+
+  <!-- DOWNLOAD ALL BANNER -->
+  <div class="all-banner fi">
+    <div class="all-banner-text">
+      <h3>Barcha yillar to'plami</h3>
+      <p>1967–2025 yillar barcha IPhO masala va yechimlari — bitta ZIP arxivda</p>
+    </div>
+    <a href="pdfs/ipho/barcha-yillar.zip" class="btn-download-all" download>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Hammasini yuklab olish
+    </a>
+  </div>
+
+  <!-- DECADE FILTER TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="filterYears('all',this)">Barchasi</button>
+    <button class="tab" onclick="filterYears('2020',this)">2020–2025</button>
+    <button class="tab" onclick="filterYears('2010',this)">2010–2019</button>
+    <button class="tab" onclick="filterYears('2000',this)">2000–2009</button>
+    <button class="tab" onclick="filterYears('1990',this)">1990–1999</button>
+    <button class="tab" onclick="filterYears('1980',this)">1980–1989</button>
+    <button class="tab" onclick="filterYears('1967',this)">1967–1979</button>
+  </div>
+
+  <div class="years-grid" id="years-grid"></div>
+</div>
+
+<!-- ── CONTACT ── -->
+<div class="wrap" id="contact">
+  <div class="sec-lbl">BOG'LANISH</div>
+  <h2 class="sec-title">Aloqa</h2>
+  <div class="sec-line"></div>
+  <div class="contact-row">
+    <a href="mailto:sizningemail@gmail.com" class="c-card fi">
+      <div class="c-type">EMAIL</div>
+      <div class="c-val">sizningemail@gmail.com</div>
+    </a>
+    <a href="https://t.me/yourtelegram" class="c-card fi" target="_blank" rel="noopener">
+      <div class="c-type">TELEGRAM</div>
+      <div class="c-val">@yourtelegram</div>
+    </a>
+    <a href="https://github.com/yourgithub" class="c-card fi" target="_blank" rel="noopener">
+      <div class="c-type">GITHUB</div>
+      <div class="c-val">github.com/yourgithub</div>
+    </a>
+  </div>
+</div>
+
+<footer>
+  <p>© 2025 Kozimjon Turg'unov · Fizika ta'limiga mehr bilan 🇺🇿</p>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   IPhO DATA — 1967-2025
+   done: false  → PDF hali yuklanmagan (tez kunda)
+   done: true   → PDF yuklanganida  true  qiling
+   pdf: "pdfs/ipho/1967.pdf"  → fayl yo'li (siz o'zgartirishingiz mumkin)
+════════════════════════════════════════════════════ */
+const DATA = [
+  {y:2025,loc:"Franciya",done:false},
+  {y:2024,loc:"Eron",done:false},
+  {y:2023,loc:"Yaponiya",done:false},
+  {y:2022,loc:"Shveytsariya",done:false},
+  {y:2021,loc:"Litva",done:false},
+  {y:2020,loc:"Online (COVID)",done:false},
+  {y:2019,loc:"Isroil",done:false},
+  {y:2018,loc:"Portugaliya",done:false},
+  {y:2017,loc:"Indoneziya",done:false},
+  {y:2016,loc:"Shveytsariya",done:false},
+  {y:2015,loc:"Hindiston",done:false},
+  {y:2014,loc:"Qozog'iston",done:false},
+  {y:2013,loc:"Daniya",done:false},
+  {y:2012,loc:"Estoniya",done:false},
+  {y:2011,loc:"Tailand",done:false},
+  {y:2010,loc:"Xorvatiya",done:false},
+  {y:2009,loc:"Meksika",done:false},
+  {y:2008,loc:"Vyetnam",done:false},
+  {y:2007,loc:"Eron",done:false},
+  {y:2006,loc:"Singapur",done:false},
+  {y:2005,loc:"Ispaniya",done:false},
+  {y:2004,loc:"Janubiy Koreya",done:false},
+  {y:2003,loc:"Tayvan",done:false},
+  {y:2002,loc:"Indoneziya",done:false},
+  {y:2001,loc:"Turkiya",done:false},
+  {y:2000,loc:"Eron",done:false},
+  {y:1999,loc:"Italiya",done:false},
+  {y:1998,loc:"Islandiya",done:false},
+  {y:1997,loc:"Kanada",done:false},
+  {y:1996,loc:"Norvegiya",done:false},
+  {y:1995,loc:"Avstraliya",done:false},
+  {y:1994,loc:"Xitoy",done:false},
+  {y:1993,loc:"AQSh",done:false},
+  {y:1992,loc:"Finlandiya",done:false},
+  {y:1991,loc:"Kuba",done:false},
+  {y:1990,loc:"Niderlandiya",done:false},
+  {y:1989,loc:"Polsha",done:false},
+  {y:1988,loc:"Avstriya",done:false},
+  {y:1987,loc:"Germaniya (GDR)",done:false},
+  {y:1986,loc:"Buyuk Britaniya",done:false},
+  {y:1985,loc:"Yugoslaviya",done:false},
+  {y:1984,loc:"Shvetsiya",done:false},
+  {y:1983,loc:"Ruminiya",done:false},
+  {y:1982,loc:"Germaniya (FRG)",done:false},
+  {y:1981,loc:"Bolgariya",done:false},
+  /* 1980 — IPhO bo'lmagan */
+  {y:1979,loc:"Bolgariya",done:false},
+  /* 1978 — IPhO bo'lmagan */
+  {y:1977,loc:"Chexoslovakiya",done:false},
+  {y:1976,loc:"Vengriya",done:false},
+  {y:1975,loc:"Germaniya (GDR)",done:false},
+  {y:1974,loc:"SSSR",done:false},
+  /* 1973 — IPhO bo'lmagan */
+  {y:1972,loc:"Ruminiya",done:false},
+  {y:1971,loc:"Chexoslovakiya",done:false},
+  {y:1970,loc:"SSSR",done:false},
+  {y:1969,loc:"Chexoslovakiya",done:false},
+  {y:1968,loc:"Vengriya",done:false},
+  {y:1967,loc:"Polsha",done:false},
+];
+
+const DL_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+
+function pdfPath(y){ return `pdfs/ipho/${y}.pdf`; }
+
+function makeCard(d){
+  const btn = d.done
+    ? `<a href="${pdfPath(d.y)}" class="btn-dl" download>${DL_SVG}PDF yuklab olish</a>`
+    : `<span class="btn-dl coming">${DL_SVG}Tez kunda</span>`;
+  return `<div class="year-card fi${d.done?' ready':''}">
+    <div class="ynum">${d.y}</div>
+    <div class="yloc">${d.loc}</div>
+    ${btn}
+  </div>`;
+}
+
+function filterYears(range, btn){
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  let list;
+  if(range==='all')       list = DATA;
+  else if(range==='2020') list = DATA.filter(d => d.y >= 2020);
+  else if(range==='2010') list = DATA.filter(d => d.y >= 2010 && d.y < 2020);
+  else if(range==='2000') list = DATA.filter(d => d.y >= 2000 && d.y < 2010);
+  else if(range==='1990') list = DATA.filter(d => d.y >= 1990 && d.y < 2000);
+  else if(range==='1980') list = DATA.filter(d => d.y >= 1980 && d.y < 1990);
+  else if(range==='1967') list = DATA.filter(d => d.y < 1980);
+  document.getElementById('years-grid').innerHTML = list.map(makeCard).join('');
+  document.querySelectorAll('.year-card.fi').forEach(el => obs.observe(el));
+}
+
+/* ── Scroll fade-in ── */
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('v'); });
+}, {threshold: 0.06});
+
+function observeAll(){
+  document.querySelectorAll('.fi').forEach(el => obs.observe(el));
+}
+
+filterYears('all', document.querySelector('.tab.active'));
+observeAll();
+
+/* ── Particle canvas ── */
+const cvs = document.getElementById('cvs');
+const ctx = cvs.getContext('2d');
+let W, H, pts = [];
+
+function resize(){ W = cvs.width = innerWidth; H = cvs.height = innerHeight; }
+
+function initPts(){
+  pts = [];
+  const n = Math.min(Math.floor(W * H / 13000), 75);
+  for(let i = 0; i < n; i++){
+    pts.push({
+      x: Math.random()*W, y: Math.random()*H,
+      dx:(Math.random()-.5)*.22, dy:(Math.random()-.5)*.22,
+      r: Math.random()*1.1+.3, a: Math.random()*.55+.12
+    });
+  }
+}
+
+function drawPts(){
+  ctx.clearRect(0,0,W,H);
+  for(let i=0;i<pts.length;i++){
+    for(let j=i+1;j<pts.length;j++){
+      const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
+      if(d<105){
+        ctx.beginPath();
+        ctx.strokeStyle=`rgba(245,158,11,${.16*(1-d/105)})`;
+        ctx.lineWidth=.4;
+        ctx.moveTo(pts[i].x,pts[i].y);
+        ctx.lineTo(pts[j].x,pts[j].y);
+        ctx.stroke();
+      }
+    }
+    const p=pts[i];
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(245,158,11,${p.a})`; ctx.fill();
+    p.x+=p.dx; p.y+=p.dy;
+    if(p.x<0||p.x>W) p.dx*=-1;
+    if(p.y<0||p.y>H) p.dy*=-1;
+  }
+  requestAnimationFrame(drawPts);
+}
+
+window.addEventListener('resize',()=>{ resize(); initPts(); });
+resize(); initPts(); drawPts();
+</script>
+</body>
+</html>
