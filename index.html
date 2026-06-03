@@ -114,20 +114,53 @@
     .fi{opacity:0;transform:translateY(16px);transition:opacity .6s,transform .6s}
     .fi.v{opacity:1;transform:translateY(0)}
 
+    /* ── HAMBURGER ── */
+    .nav-toggle{display:none;flex-direction:column;justify-content:center;gap:5px;background:transparent;border:none;cursor:pointer;padding:6px;z-index:210}
+    .nav-toggle span{display:block;width:22px;height:2px;background:var(--muted);border-radius:2px;transition:all .3s}
+    .nav-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg);background:var(--gold)}
+    .nav-toggle.open span:nth-child(2){opacity:0}
+    .nav-toggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);background:var(--gold)}
+
+    /* ── MOBILE MENU OVERLAY ── */
+    .nav-mobile{position:fixed;inset:0;background:rgba(8,13,26,.97);z-index:190;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;opacity:0;pointer-events:none;transition:opacity .28s;backdrop-filter:blur(12px)}
+    .nav-mobile.open{opacity:1;pointer-events:all}
+    .nav-mobile ul{list-style:none;text-align:center}
+    .nav-mobile ul li{margin:1.2rem 0}
+    .nav-mobile ul li a{color:var(--text);text-decoration:none;font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:600;letter-spacing:-.01em;transition:color .2s}
+    .nav-mobile ul li a:hover{color:var(--gold)}
+    .nav-mobile-badge{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--dim);letter-spacing:.18em;margin-top:2.5rem}
+
     @media(max-width:640px){
+      nav{padding:.85rem 1.25rem}
       .nav-links{display:none}
-      .years-grid{grid-template-columns:repeat(2,1fr)}
+      .nav-toggle{display:flex}
+      .wrap{padding:4rem 1.25rem}
+      .years-grid{grid-template-columns:repeat(2,1fr);gap:.75rem}
       .ynum{font-size:2.4rem}
       .all-banner{flex-direction:column;align-items:flex-start}
       .modal{height:95vh}
       .modal-info{gap:.5rem}
       .modal-year{font-size:1rem}
+      /* Kattaroq touch target */
+      .btn-view,.btn-dl{padding:.55rem .9rem;font-size:.78rem}
+      .card-btns{gap:.35rem}
+      .c-card{min-width:100%;padding:1rem}
     }
   </style>
 </head>
 <body>
 
 <canvas id="cvs"></canvas>
+
+<!-- ── MOBILE NAV OVERLAY ── -->
+<div class="nav-mobile" id="nav-mobile">
+  <ul>
+    <li><a href="#about"   onclick="closeMobileMenu()">Haqimda</a></li>
+    <li><a href="#ipho"    onclick="closeMobileMenu()">IPhO Arxiv</a></li>
+    <li><a href="#contact" onclick="closeMobileMenu()">Bog'lanish</a></li>
+  </ul>
+  <div class="nav-mobile-badge">IPhO · 1967–2025 · O'zbek tilida</div>
+</div>
 
 <!-- ── NAVBAR ── -->
 <nav>
@@ -137,6 +170,9 @@
     <li><a href="#ipho">IPhO Arxiv</a></li>
     <li><a href="#contact">Bog'lanish</a></li>
   </ul>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Menyuni ochish">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
 
 <!-- ── HERO ── -->
@@ -251,9 +287,9 @@
    yil: "https://github.com/.../releases/download/v1.0/FAYL.pdf"
 ══════════════════════════════════════ */
 const PDF_URLS = {
-  2006: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2006_QS.pdf",
+  2008: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2006_QS.pdf",
   2008: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2008_QS.pdf",
-  2009: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2009_QS.pdf",
+  2009: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2008_QS.pdf",
   2010: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2010_QS.pdf",
   2011: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2011_QS.pdf",
   2012: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2012_QS.pdf",
@@ -372,8 +408,26 @@ function filterYears(range, btn){
   document.querySelectorAll('.year-card.fi').forEach(el => obs.observe(el));
 }
 
+/* ── MOBILE MENU ── */
+function closeMobileMenu(){
+  document.getElementById('nav-mobile').classList.remove('open');
+  document.getElementById('nav-toggle').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('nav-toggle').addEventListener('click', function(){
+  const isOpen = this.classList.toggle('open');
+  document.getElementById('nav-mobile').classList.toggle('open', isOpen);
+  document.body.style.overflow = isOpen ? 'hidden' : '';
+});
+
 /* ── MODAL ── */
 function openModal(year, loc, pdf){
+  /* Telefonda PDF ni yangi tabda ochadi (iframe telefonda ishlamaydi) */
+  if(window.innerWidth <= 640){
+    window.open(pdf, '_blank');
+    return;
+  }
   document.getElementById('modal-year').textContent = 'IPhO ' + year;
   document.getElementById('modal-loc').textContent  = loc;
   document.getElementById('modal-iframe').src       = viewerUrl(pdf);
