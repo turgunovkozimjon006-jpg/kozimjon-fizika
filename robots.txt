@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://turgunovkozimjon006.github.io/kozimjon-fizika/sitemap.xml
