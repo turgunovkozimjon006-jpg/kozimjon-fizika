@@ -36,6 +36,9 @@
   }
   </script>
 
+  <!-- JSZip kutubxonasi (ZIP yaratish uchun) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -214,6 +217,7 @@
       gap: 1.5rem; flex-wrap: wrap;
       backdrop-filter: blur(16px); margin-bottom: 2.8rem;
       box-shadow: var(--shadow-gold);
+      transition: opacity 0.3s;
     }
     .all-banner-text h3{
       font-family: 'Playfair Display', serif; font-size: 1.3rem;
@@ -227,9 +231,18 @@
       text-decoration: none; font-size: 0.9rem; font-weight: 600;
       white-space: nowrap; transition: transform 0.2s, box-shadow 0.2s;
       box-shadow: 0 4px 14px rgba(245,158,11,0.3);
+      cursor: pointer;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
     }
     .btn-download-all:hover{ transform: translateY(-2px); box-shadow: 0 8px 22px rgba(245,158,11,0.45); }
+    .btn-download-all:disabled{ opacity: 0.5; pointer-events: none; }
     .btn-download-all svg{ width: 18px; height: 18px; }
+
+    .progress-text{
+      font-size: 0.8rem; color: var(--gold-light);
+      margin-top: 0.5rem; min-height: 20px;
+    }
 
     /* ---------- FILTER TABS ---------- */
     .tabs{ display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
@@ -490,15 +503,16 @@
     Har yil uchun masala va yechim bitta PDF faylda jamlangan.
   </p>
 
-  <div class="all-banner fi">
+  <div class="all-banner fi" id="all-banner">
     <div class="all-banner-text">
       <h3>Barcha yillar to'plami</h3>
       <p>1967–2025 yillar barcha IPhO masala va yechimlari — bitta ZIP arxivda</p>
+      <div class="progress-text" id="zip-progress"></div>
     </div>
-    <a href="pdfs/ipho/barcha-yillar.zip" class="btn-download-all" download>
+    <button class="btn-download-all" id="download-all-btn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Hammasini yuklab olish
-    </a>
+    </button>
   </div>
 
   <div class="tabs">
@@ -580,27 +594,19 @@
 <script>
 /* ══════════════════════════════════════
    GitHub Releases PDF linklari
-   Yangi yil qo'shganda shu yerga qo'shing:
-   yil: "https://github.com/.../releases/download/v1.0/FAYL.pdf"
 ══════════════════════════════════════ */
 const PDF_URLS = {
-  1993: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_1993_Q_merged.pdf",
-  1996: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_1996_QS.pdf",
-  2006: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2006_QS.pdf",
   2008: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2008_QS.pdf",
-  2009: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2009_QS.pdf",
+  2009: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2008_QS.pdf",
   2010: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2010_QS.pdf",
   2011: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2011_QS.pdf",
   2012: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2012_QS.pdf",
   2013: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2013_QS.pdf",
   2014: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2014_QS.pdf",
-  2015: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2015_QS.pdf",
 };
 
 /* ══════════════════════════════════════
    IPhO DATA
-   done:true  → PDF yuklangan
-   done:false → hali yuklanmagan
 ══════════════════════════════════════ */
 const DATA = [
   {y:2025,loc:"Franciya",done:false},
@@ -661,7 +667,6 @@ const DATA = [
   {y:1967,loc:"Polsha",done:true},
 ];
 
-/* PDF_URLS da bo'lsa release linkini, bo'lmasa papkadan oladi */
 function pdfPath(y){
   return PDF_URLS[y] || `pdfs/ipho/${y}.pdf`;
 }
@@ -730,8 +735,7 @@ const DL_SVG  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 function makeCard(d){
   const pdf = pdfPath(d.y);
   const dis = d.done ? '' : ' btn-disabled';
-  // *** TUZATILGAN JOY: loc ichidagi apostroflardan qutilish ***
-  const escapedLoc = d.loc.replace(/'/g, "&#39;");
+  const escapedLoc = d.loc.replace(/'/g, "\\'");
   const viewBtn = `<button class="btn-view${dis}" ${d.done?`onclick="openModal(${d.y},'${escapedLoc}','${pdf}')"`:''}>
     ${EYE_SVG}Ko'rish</button>`;
   const dlBtn = `<a class="btn-dl${dis}" href="${pdf}" download target="_blank">
@@ -775,6 +779,62 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal();
 document.getElementById('modal-bg').addEventListener('click', function(e){
   if(e.target === this) closeModal();
 });
+
+/* ── ZIP YARATISH VA YUKLASH ── */
+async function downloadAllAsZip(){
+  const btn = document.getElementById('download-all-btn');
+  const progressDiv = document.getElementById('zip-progress');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px;"></span> Tayyorlanmoqda...';
+  progressDiv.textContent = '';
+
+  const zip = new JSZip();
+  // Faqat done:true bo'lgan yillarni olamiz (PDF tayyor)
+  const readyYears = DATA.filter(d => d.done === true);
+  const total = readyYears.length;
+  let completed = 0;
+
+  for (let item of readyYears) {
+    const year = item.y;
+    const url = pdfPath(year);
+    const fileName = `IPhO_${year}.pdf`;
+    try {
+      progressDiv.textContent = `Yuklanmoqda: ${year} (${completed+1}/${total})`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Status ${response.status}`);
+      const blob = await response.blob();
+      zip.file(fileName, blob);
+      completed++;
+    } catch (err) {
+      console.warn(`${year} yuklab olinmadi:`, err);
+      progressDiv.textContent = `${year} yuklab olinmadi, davom ettirilmoqda...`;
+    }
+  }
+
+  if (completed === 0) {
+    progressDiv.textContent = 'Hech qanday PDF yuklab olinmadi.';
+    btn.disabled = false;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Hammasini yuklab olish`;
+    return;
+  }
+
+  progressDiv.textContent = `ZIP yaratilmoqda...`;
+  const content = await zip.generateAsync({ type: "blob" });
+  const zipUrl = URL.createObjectURL(content);
+  const a = document.createElement('a');
+  a.href = zipUrl;
+  a.download = "IPhO_1967-2025.zip";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(zipUrl);
+
+  progressDiv.textContent = `✅ Yuklab olindi! (${completed} ta fayl)`;
+  btn.disabled = false;
+  btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Hammasini yuklab olish`;
+}
+
+document.getElementById('download-all-btn').addEventListener('click', downloadAllAsZip);
 
 /* ── Scroll fade-in ── */
 const obs = new IntersectionObserver(entries => {
