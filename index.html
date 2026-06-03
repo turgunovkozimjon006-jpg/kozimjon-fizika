@@ -327,8 +327,9 @@
    yil: "https://github.com/.../releases/download/v1.0/FAYL.pdf"
 ══════════════════════════════════════ */
 const PDF_URLS = {
+  2006: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2006_QS.pdf",
   2008: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2008_QS.pdf",
-  2009: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2008_QS.pdf",
+  2009: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2009_QS.pdf",
   2010: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2010_QS.pdf",
   2011: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2011_QS.pdf",
   2012: "https://github.com/turgunovkozimjon006/kozimjon-fizika/releases/download/v1.0/IPHO_2012_QS.pdf",
@@ -443,11 +444,20 @@ function filterYears(range, btn){
 }
 
 /* ── MODAL ── */
+/* Telefon yoki planshet ekanligini aniqlash — ikki usul birga */
+function isMobile(){
+  const byAgent = /Android|iPhone|iPad|iPod|webOS|BlackBerry|Mobile/i.test(navigator.userAgent);
+  const byWidth = window.innerWidth <= 768;
+  return byAgent || byWidth;
+}
+
 function openModal(year, loc, pdf){
-  if(window.innerWidth <= 640){
+  /* Telefon/planshetda yangi tabda ochadi */
+  if(isMobile()){
     window.open(pdf, '_blank');
     return;
   }
+  /* Kompyutarda modal oynada ochadi */
   document.getElementById('modal-loading').classList.remove('hide');
   document.getElementById('modal-year').textContent = 'IPhO ' + year;
   document.getElementById('modal-loc').textContent  = loc;
