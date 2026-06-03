@@ -794,7 +794,7 @@ async function downloadAllAsZip(){
 
   const zip = new JSZip();
   // Faqat done:true bo'lgan yillarni olamiz (PDF tayyor)
-  const readyYears = DATA.filter(d => d.done === true);
+  const readyYears = DATA;   // barcha yillarni olish (46 ta)
   const total = readyYears.length;
   let completed = 0;
 
